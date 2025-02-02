@@ -38,7 +38,7 @@ else:
     print("\n📊 Estadísticas de las variables numéricas:")
     print(df.describe())
 
-    # 📌 **Crear la carpeta 'data/' si no existe**
+    # Crear la carpeta 'data/' si no existe
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
         print(f"📂 Carpeta creada: {data_dir}")
@@ -46,3 +46,38 @@ else:
     # Guardar el dataset limpio
     df.to_csv(clean_data_path, index=False)
     print(f"\n✅ Datos guardados en: {clean_data_path}")
+
+    ### Clasificación Automática de Variables ###
+    # Diccionario para clasificar las variables
+    classification = {}
+
+    for column in df.columns:
+        dtype = df[column].dtype  # Obtener el tipo de dato de la columna
+        
+        if dtype == "object":
+            classification[column] = "Cualitativa Nominal"
+        elif dtype == "int64":
+            classification[column] = "Cuantitativa Discreta"
+        elif dtype == "float64":
+            classification[column] = "Cuantitativa Continua"
+        elif "datetime" in str(dtype):
+            classification[column] = "Cualitativa Nominal"
+    
+    # Correcciones manuales para ciertas variables mal detectadas
+    continuous_vars = ["budget", "revenue", "runtime", "popularity", "voteAvg", "actorsPopularity"]
+    discrete_vars = ["castWomenAmount", "castMenAmount"]
+
+    for var in continuous_vars:
+        if var in classification:
+            classification[var] = "Cuantitativa Continua"
+
+    for var in discrete_vars:
+        if var in classification:
+            classification[var] = "Cuantitativa Discreta"
+    
+    # Convertir la clasificación a un DataFrame
+    classification_df = pd.DataFrame(list(classification.items()), columns=["Variable", "Tipo"])
+
+    # Mostrar la clasificación
+    print("\n📌 Clasificación de las Variables:")
+    print(classification_df)
