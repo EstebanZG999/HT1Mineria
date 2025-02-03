@@ -55,12 +55,14 @@ print("\n(d) ❌ Top 10 peores películas según los votos de los usuarios:")
 print(worst_movies)
 
 # Gráfico de barras horizontales
-plt.figure(figsize=(8, 6))
+plt.figure(figsize=(7, 4)) 
 plt.barh(worst_movies["title"], worst_movies["voteAvg"], color="red")
 plt.xlabel("Promedio de Votos")
 plt.title("Top 10 peores películas según los usuarios")
-plt.xlim(0, 10)
+plt.xlim(0, 5)
 plt.gca().invert_yaxis()
+plt.xticks(fontsize=9)
+plt.yticks(fontsize=7)
 plt.tight_layout()
 plt.show()
 
@@ -174,4 +176,47 @@ plt.ylabel("Ingreso promedio (Millones de USD)")
 plt.xticks(range(1, 13), ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"], rotation=45)
 plt.title("Promedio de ingresos por mes de lanzamiento")
 plt.tight_layout()
+plt.show()
+
+# -----------------------------------------------------------
+# (n) Correlación entre calificaciones y éxito comercial
+# -----------------------------------------------------------
+correlation = df[["voteAvg", "revenue"]].corr().iloc[0, 1]
+
+print(f"\n⭐ Correlación entre calificaciones y éxito comercial: {correlation:.2f}")
+
+# Gráfico de dispersión
+plt.figure(figsize=(8, 6))
+plt.scatter(df["voteAvg"], df["revenue"], alpha=0.5)
+plt.xlabel("Calificación Promedio (voteAvg)")
+plt.ylabel("Ingresos (USD)")
+plt.title("Relación entre Calificaciones y Éxito Comercial")
+plt.grid(True)
+plt.show()
+
+# ----------------------------------------------------------------------
+# (p) ¿Popularidad del elenco directamente correlacionada con el éxito?
+# ----------------------------------------------------------------------
+# Convertir 'actorsPopularity' en valores numéricos (promedio de la lista)
+def parse_and_average(popularity_str):
+    try:
+        values = list(map(float, popularity_str.split("|")))  # Convertir cada número a float
+        return np.mean(values) if values else np.nan  # Calcular el promedio
+    except:
+        return np.nan  # Si hay un error, devolver NaN
+
+# Aplicar la conversión a la columna 'actorsPopularity'
+df["actorsPopularity"] = df["actorsPopularity"].astype(str).apply(parse_and_average)
+
+# Calcular la correlación
+correlation_cast_popularity = df["actorsPopularity"].corr(df["revenue"])
+
+print(f"\n🎭 Correlación entre popularidad del elenco y éxito de taquilla: {correlation_cast_popularity:.2f}")
+
+# Gráfico de dispersión
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x=df["actorsPopularity"], y=df["revenue"], alpha=0.5)
+plt.xlabel("Popularidad del Elenco (Promedio de actorsPopularity)")
+plt.ylabel("Ingresos (USD)")
+plt.title("Relación entre Popularidad del Elenco y Éxito de Taquilla")
 plt.show()
