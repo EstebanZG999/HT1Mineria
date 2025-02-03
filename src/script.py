@@ -40,7 +40,7 @@ else:
 
     # Descripción estadística de las variables numéricas
     print("\n📊 Estadísticas de las variables numéricas:")
-    print(df.describe())
+    print(df.describe().applymap(lambda x: f"{x:,.2f}"))
 
     # Crear la carpeta 'data/' si no existe
     if not os.path.exists(data_dir):
@@ -139,7 +139,7 @@ else:
 
         normality_results.append({
             "Variable": var,
-            "Shapiro-Wilk p-valor": shapiro_test[1] if shapiro_test[1] is not None else "N/A",
+            "Shapiro-Wilk p-valor": f"{shapiro_test[1]:.6f}" if shapiro_test[1] is not None else "N/A",
             "Kolmogorov-Smirnov p-valor": ks_test.pvalue
         })
 
