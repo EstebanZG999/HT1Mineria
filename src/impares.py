@@ -85,7 +85,6 @@ plt.show()
 # -----------------------------------------------------------
 # (g) Los géneros que generaron más ganancias
 # -----------------------------------------------------------
-# 'genres' está separada por '|', la convertimos a lista y hacemos explode
 df["genres"] = df["genres"].fillna("")
 df["genres"] = df["genres"].apply(lambda x: x.split("|") if isinstance(x, str) else [])
 
@@ -108,3 +107,106 @@ plt.title("Top 10 géneros con más ganancias")
 plt.xticks(rotation=45, ha="right")
 plt.tight_layout()
 plt.show()
+
+# -----------------------------------------------------------
+# (i) Influencia del reparto (hombres/mujeres) en popularidad e ingresos
+# -----------------------------------------------------------
+# Analizaremos la cantidad de mujeres en el elenco vs popularidad e ingresos
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+
+# 1) DEFINIR RANGOS PARA AGRUPAR
+women_bins = [0, 2, 5, 10, 20, 50, 200]  # Ajusta según tu dataset
+women_labels = ["0-2", "3-5", "6-10", "11-20", "21-50", "50+"]
+
+men_bins = [0, 2, 5, 10, 20, 50, 200]
+men_labels = ["0-2", "3-5", "6-10", "11-20", "21-50", "50+"]
+
+df["castWomenRange"] = pd.cut(df["castWomenAmount"], bins=women_bins, labels=women_labels)
+df["castMenRange"] = pd.cut(df["castMenAmount"], bins=men_bins, labels=men_labels)
+
+# ------------------------------------------------------------------------------
+# 2) CALCULAR PROMEDIOS DE POPULARIDAD E INGRESOS POR CADA RANGO
+# ------------------------------------------------------------------------------
+women_popularity_mean = df.groupby("castWomenRange")["popularity"].mean()
+women_revenue_mean = df.groupby("castWomenRange")["revenue"].mean()
+
+men_popularity_mean = df.groupby("castMenRange")["popularity"].mean()
+men_revenue_mean = df.groupby("castMenRange")["revenue"].mean()
+
+print("Promedio de popularidad por rango de actrices:\n", women_popularity_mean, "\n")
+print("Promedio de ingresos por rango de actrices:\n", women_revenue_mean, "\n")
+
+print("Promedio de popularidad por rango de actores:\n", men_popularity_mean, "\n")
+print("Promedio de ingresos por rango de actores:\n", men_revenue_mean, "\n")
+
+# ------------------------------------------------------------------------------
+# 3) GRÁFICOS DE BARRAS PARA VISUALIZAR ESOS PROMEDIOS
+# ------------------------------------------------------------------------------
+fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+
+# (a) Popularidad por rango de actrices
+sns.barplot(
+    ax=axes[0, 0],
+    x=women_popularity_mean.index,
+    y=women_popularity_mean.values,
+    palette="Blues"
+)
+axes[0, 0].set_title("Popularidad promedio por rango de actrices")
+axes[0, 0].set_xlabel("Rango de actrices")
+axes[0, 0].set_ylabel("Popularidad promedio")
+
+# (b) Ingresos por rango de actrices
+sns.barplot(
+    ax=axes[0, 1],
+    x=women_revenue_mean.index,
+    y=women_revenue_mean.values,
+    palette="Greens"
+)
+axes[0, 1].set_title("Ingresos promedio por rango de actrices")
+axes[0, 1].set_xlabel("Rango de actrices")
+axes[0, 1].set_ylabel("Ingresos promedio (USD)")
+
+# (c) Popularidad por rango de actores
+sns.barplot(
+    ax=axes[1, 0],
+    x=men_popularity_mean.index,
+    y=men_popularity_mean.values,
+    palette="Blues"
+)
+axes[1, 0].set_title("Popularidad promedio por rango de actores")
+axes[1, 0].set_xlabel("Rango de actores")
+axes[1, 0].set_ylabel("Popularidad promedio")
+
+# (d) Ingresos por rango de actores
+sns.barplot(
+    ax=axes[1, 1],
+    x=men_revenue_mean.index,
+    y=men_revenue_mean.values,
+    palette="Greens"
+)
+axes[1, 1].set_title("Ingresos promedio por rango de actores")
+axes[1, 1].set_xlabel("Rango de actores")
+axes[1, 1].set_ylabel("Ingresos promedio (USD)")
+
+plt.tight_layout()
+plt.show()
+
+# ------------------------------------------------------------------------------
+# 4) CALCULAR CORRELACIONES
+#    Para cuantificar si existe relación lineal (positiva/negativa) y cuán fuerte.
+# ------------------------------------------------------------------------------
+
+corr_women_popularity = df["castWomenAmount"].corr(df["popularity"])
+corr_women_revenue = df["castWomenAmount"].corr(df["revenue"])
+
+corr_men_popularity = df["castMenAmount"].corr(df["popularity"])
+corr_men_revenue = df["castMenAmount"].corr(df["revenue"])
+
+print(f"Correlación (cantidad de actrices vs popularidad): {corr_women_popularity:.3f}")
+print(f"Correlación (cantidad de actrices vs ingresos):   {corr_women_revenue:.3f}")
+print(f"Correlación (cantidad de actores vs popularidad): {corr_men_popularity:.3f}")
+print(f"Correlación (cantidad de actores vs ingresos):   {corr_men_revenue:.3f}")
+
