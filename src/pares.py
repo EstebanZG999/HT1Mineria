@@ -138,7 +138,7 @@ plt.grid()
 plt.show()
 
 # -----------------------------------------------------------
-# Obtener las 20 películas mejor calificadas
+# (j) Obtener las 20 películas mejor calificadas
 # -----------------------------------------------------------
 top_rated_movies = df.nlargest(20, "voteAvg")[["title", "voteAvg", "director"]].dropna()
 top_rated_movies["director"] = top_rated_movies["director"].apply(lambda x: x if len(x) <= 30 else x[:27] + "...")
@@ -159,7 +159,7 @@ plt.tight_layout()
 plt.show()
 
 # -----------------------------------------------------------
-# ¿Se asocian ciertos meses de lanzamiento con mejores ingresos?
+# (l) ¿Se asocian ciertos meses de lanzamiento con mejores ingresos?
 # -----------------------------------------------------------
 
 monthly_revenue = df.groupby("month")["revenue"].mean().sort_index()
