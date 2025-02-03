@@ -210,3 +210,31 @@ print(f"Correlación (cantidad de actrices vs ingresos):   {corr_women_revenue:.
 print(f"Correlación (cantidad de actores vs popularidad): {corr_men_popularity:.3f}")
 print(f"Correlación (cantidad de actores vs ingresos):   {corr_men_revenue:.3f}")
 
+
+
+# -----------------------------------------------------------
+# (k) Relación entre presupuesto e ingresos (histograma y diagrama de dispersión)
+# -----------------------------------------------------------
+
+df["budget_millions"] = df["budget"] / 1_000_000
+df["revenue_millions"] = df["revenue"] / 1_000_000
+
+# 1) Diagrama de dispersión
+plt.figure(figsize=(8, 6))
+plt.scatter(df["budget_millions"], df["revenue_millions"], alpha=0.5, color="purple")
+plt.xlabel("Presupuesto (Millones USD)")
+plt.ylabel("Ingresos (Millones USD)")
+plt.title("Relación entre Presupuesto e Ingresos (en millones)")
+plt.tight_layout()
+plt.show()
+
+# 2) Histograma de la diferencia (o de la propia variable)
+#    Por ejemplo, histograma del presupuesto
+plt.figure(figsize=(8, 5))
+plt.hist(df["budget_millions"].dropna(), bins=50, color="teal", edgecolor="black")
+plt.xlim(0, 200)  
+plt.xlabel("Presupuesto (Millones USD)")
+plt.ylabel("Frecuencia")
+plt.title("Distribución del Presupuesto (en millones)")
+plt.tight_layout()
+plt.show()
