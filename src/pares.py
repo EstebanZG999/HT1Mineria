@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 # -----------------------------------------------------------
 # Cargar el dataset limpio
@@ -104,5 +105,73 @@ plt.barh(longest_movies["title"], longest_movies["runtime"], color="lightcoral")
 plt.xlabel("Duración (minutos)")
 plt.title("Top 10 Películas más largas")
 plt.gca().invert_yaxis()
+plt.tight_layout()
+plt.show()
+
+# -----------------------------------------------------------
+# (h) ¿La cantidad de actores influye en los ingresos?
+# -----------------------------------------------------------
+plt.figure(figsize=(8, 6))
+sns.scatterplot(data=df, x="actorsAmount", y="revenue", alpha=0.5)
+plt.xlabel("Cantidad de Actores")
+plt.ylabel("Ingresos (USD)")
+plt.title("Relación entre la cantidad de actores y los ingresos")
+plt.show()
+
+# Calcular correlación entre actores y ingresos
+correlation = df[["actorsAmount", "revenue"]].corr().iloc[0, 1]
+print(f"\n📊 Correlación entre cantidad de actores e ingresos: {correlation:.2f}")
+
+# -----------------------------------------------------------
+# (h) ¿Se han hecho películas con más actores en los últimos años?
+# -----------------------------------------------------------
+avg_actors_per_year = df.groupby("year")["actorsAmount"].mean()
+
+plt.figure(figsize=(10, 5))
+plt.plot(avg_actors_per_year.index, avg_actors_per_year.values, marker="o", linestyle="-", color="purple")
+plt.xlabel("Año")
+plt.ylabel("Promedio de Actores por Película")
+plt.title("Evolución del número de actores en las películas")
+plt.grid()
+plt.show()
+
+# -----------------------------------------------------------
+# Obtener las 20 películas mejor calificadas
+# -----------------------------------------------------------
+top_rated_movies = df.nlargest(20, "voteAvg")[["title", "voteAvg", "director"]].dropna()
+top_rated_movies["director"] = top_rated_movies["director"].apply(lambda x: x if len(x) <= 30 else x[:27] + "...")
+
+print("\n(g) 🎬 Directores de las 20 películas mejor calificadas:")
+print(top_rated_movies.to_string(index=False))
+
+director_counts = top_rated_movies["director"].value_counts()
+
+# Gráfico de los directores con más películas en el Top 20
+plt.figure(figsize=(8, 4))
+director_counts.plot(kind="bar", color="royalblue")
+plt.xlabel("Director")
+plt.ylabel("Cantidad de películas en el Top 20")
+plt.title("Directores con más películas mejor calificadas")
+plt.xticks(rotation=45, ha="right", fontsize=9)
+plt.tight_layout()
+plt.show()
+
+# -----------------------------------------------------------
+# ¿Se asocian ciertos meses de lanzamiento con mejores ingresos?
+# -----------------------------------------------------------
+
+monthly_revenue = df.groupby("month")["revenue"].mean().sort_index()
+formatted_revenue = monthly_revenue.apply(lambda x: f"${x:,.0f}")
+
+print("\n📅 Promedio de ingresos por mes:")
+print(formatted_revenue)
+
+# Gráfico de barras
+plt.figure(figsize=(10, 5))
+plt.bar(monthly_revenue.index, monthly_revenue.values, color="royalblue")
+plt.xlabel("Mes de lanzamiento")
+plt.ylabel("Ingreso promedio (Millones de USD)")
+plt.xticks(range(1, 13), ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"], rotation=45)
+plt.title("Promedio de ingresos por mes de lanzamiento")
 plt.tight_layout()
 plt.show()
